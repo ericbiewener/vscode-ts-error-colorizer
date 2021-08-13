@@ -1,0 +1,63 @@
+{
+	"name": "ts-error-colorizer",
+	"displayName": "tsErrorColorizer",
+	"publisher": "edb",
+	"description": "",
+	"version": "0.0.1",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/ericbiewener/ts-error-colorizer"
+	},
+	"engines": {
+		"vscode": "^1.57.0"
+	},
+	"categories": [
+		"Other"
+	],
+	"activationEvents": [
+		"*"
+	],
+	"main": "./out/extension.js",
+	"contributes": {
+		"commands": [
+			{
+				"command": "tsErrorColorizer.colorizeTsError",
+				"title": "Colorize TS Error"
+			}
+		]
+	},
+	"scripts": {
+		"vscode:prepublish": "webpack --mode production",
+		"build": "esbuild ./src/extension.ts --bundle --outfile=out/main.js --external:vscode --format=cjs --platform=node",
+		"compile": "tsc -p ./",
+		"watch": "tsc -watch -p ./",
+		"pretest": "yarn run compile && yarn run lint",
+		"prettier": "prettier --write \"**/*.{ts,tsx,js}\"",
+		"lint": "eslint \"**/*.{ts,js}\"",
+		"prepare": "husky install",
+		"package": "vsce package --yarn",
+		"ext": "rm -rf ~/.vscode/extensions/edb.tsErrorColorizer-[0-9]* && rm -f *.vsix && yarn run package && code --install-extension *.vsix"
+	},
+	"dependencies": {
+		"typescript": "^4.3.2"
+	},
+	"devDependencies": {
+		"@types/vscode": "^1.57.0",
+		"@typescript-eslint/eslint-plugin": "^4.26.0",
+		"@typescript-eslint/parser": "^4.26.0",
+		"eslint": "^7.27.0",
+		"husky": ">=6",
+		"lint-staged": ">=10",
+		"mocha": "^8.4.0",
+		"node-loader": "2.0.0",
+		"ts-loader": "9.2.3",
+		"webpack": "5.41.0",
+		"webpack-cli": "4.7.2"
+	},
+	"lint-staged": {
+		"**/*.{ts,tsx,js}": [
+			"prettier --write",
+			"eslint --cache --fix"
+		]
+	}
+}
