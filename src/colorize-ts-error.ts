@@ -1,34 +1,52 @@
 import vsc from "vscode";
-import fs from "fs/promises";
-import { uiNotify } from "./ui-notify";
 import { webviewHtml } from "./webview-html";
 
-const getInput = async () => {
-  const editor = vsc.window.activeTextEditor;
-  if (!editor) return;
+/**
+ * We have to propagate the panel and editor around together so that we can re-find the selection in
+ * the editor associated with an open panel.
+ */
 
-  const sel = editor.selection
-
+const getDiagnostic = async ({ document, selection }: vsc.TextEditor) => {
   const tsError = vsc.languages
-    .getDiagnostics(editor.document.uri)
-    .filter((d) => d.source === "ts" && d.range.intersection(sel))[0];
+    .getDiagnostics(document.uri)
+    .filter((d) => d.source === "ts" && d.range.intersection(selection))[0];
 
-  return tsError?.message
+  return tsError;
 };
 
-const getWebviewHtml = (input: string) => webviewHtml.replace('<REPLACE>', `\`${input}\``)
+const getWebviewHtml = (input: string) =>
+  webviewHtml.replace("<REPLACE>", `\`${input}\``);
 
-export const colorizeTsError = async () => {
-  const input =  await getInput()
-  if (!input) return
-  
-  const panel = vsc.window.createWebviewPanel(
-    "tsErrorColorizer",
-    "TS Error Colorizer",
-    vsc.ViewColumn.One,
-    { enableScripts: true }
-  );
+export const colorizeTsError = async (
+  panel?: vsc.WebviewPanel,
+  editor = vsc.window.activeTextEditor
+) => {
+  if (!editor) return;
 
-  panel.webview.html = getWebviewHtml(input);
-  console.info('::', panel.webview.html)
+  const diagnostic = await getDiagnostic(editor);
+  if (!diagnostic?.message) return;
+
+  if (!panel) {
+    panel = vsc.window.createWebviewPanel(
+      "tsErrorColorizer",
+      "TS Error Colorizer",
+      vsc.ViewColumn.One,
+      { enableScripts: true }
+    );
+
+    listenForDiagnosticsChange(panel, editor);
+  }
+
+  panel.webview.html = getWebviewHtml(diagnostic.message);
+};
+
+const listenForDiagnosticsChange = (
+  panel: vsc.WebviewPanel,
+  editor: vsc.TextEditor
+) => {
+  const listener = vsc.languages.onDidChangeDiagnostics(() => {
+    colorizeTsError(panel, editor);
+  });
+
+  panel.onDidDispose(listener.dispose);
 };

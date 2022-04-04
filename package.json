@@ -30,7 +30,7 @@
 		"vscode:prepublish": "webpack --mode production",
 		"build": "esbuild ./src/extension.ts --bundle --outfile=out/main.js --external:vscode --format=cjs --platform=node",
 		"compile": "tsc -p ./",
-		"watch": "tsc -watch -p ./",
+		"start": "tsc -watch -p ./",
 		"pretest": "yarn run compile && yarn run lint",
 		"prettier": "prettier --write \"**/*.{ts,tsx,js}\"",
 		"lint": "eslint \"**/*.{ts,js}\"",
