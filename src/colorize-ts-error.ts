@@ -24,7 +24,11 @@ export const colorizeTsError = async (
   if (!editor) return;
 
   const diagnostic = await getDiagnostic(editor);
-  if (!diagnostic?.message) return;
+  if (!diagnostic?.message) {
+    // All errors are fixed!
+    if (panel) panel.dispose()
+    return;
+  }
 
   if (!panel) {
     panel = vsc.window.createWebviewPanel(
