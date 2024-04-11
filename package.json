@@ -17,7 +17,7 @@
 	"activationEvents": [
 		"*"
 	],
-	"main": "./out/extension.js",
+	"main": "./out/main.js",
 	"contributes": {
 		"commands": [
 			{
@@ -36,7 +36,7 @@
 		"lint": "eslint \"**/*.{ts,js}\"",
 		"prepare": "husky install",
 		"package": "vsce package --yarn",
-		"ext": "rm -rf ~/.vscode/extensions/edb.tsErrorColorizer-[0-9]* && rm -f *.vsix && yarn run package && code --install-extension *.vsix"
+		"ext": "yarn build && rm -rf ~/.vscode/extensions/edb.tsErrorColorizer-[0-9]* && rm -f *.vsix && yarn run package && code --install-extension *.vsix"
 	},
 	"dependencies": {
 		"typescript": "^4.3.2"
